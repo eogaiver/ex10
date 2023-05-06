@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import {Row, Col, Card, Form, Button, InputGroup} from 'react-bootstrap'
 
 const Mypage = () => {
+    const [file, setFile] = useState(null);
     const [form, setForm] = useState({
         name:'무기명',
         phone: '010-1010-1010',
@@ -19,7 +20,8 @@ const Mypage = () => {
         setForm({
           ...form,
           image: URL.createObjectURL(e.target.files[0]),
-        })
+        });
+        setFile(e.target.files[0]);
       }
     return (
         <Row>
@@ -47,9 +49,10 @@ const Mypage = () => {
                         <div>
                             <img className='my-2' 
                                 src={image} width="25%"/>
-                            <Form.Control type="file"/>
+                            <Form.Control onChange={onChangeFile} type="file"/>
                         </div>
                         <Button 
+                            
                             className='px-5'>정보수정</Button>
                     </Form>
                 </Card>
