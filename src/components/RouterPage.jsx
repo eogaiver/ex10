@@ -13,7 +13,7 @@ import LoginPage from './LoginPage';
 import JoinPage from './JoinPage';
 import Mypage from './Mypage';
 
-const RouterPage = (history) => {
+const RouterPage = ({history}) => {
     const onLogout = () => {
         sessionStorage.removeItem('email');
         history.push('/')
@@ -39,8 +39,8 @@ const RouterPage = (history) => {
                                     <Link to="/mypage" className='me-2 pt-1'>
                                         {sessionStorage.getItem('email')}
                                     </Link>
-                                    <Link to="/logout"
-                                        onClick={onLogout}>로그아웃</Link>
+                                    <Link onClick={onLogout} 
+                                    to="/logout">로그아웃</Link>
                                 </>
                                 :
                                 <Link to="/login">로그인</Link>

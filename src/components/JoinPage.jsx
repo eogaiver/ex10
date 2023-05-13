@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import {app} from '../firebaseinit'
 import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth'  
 import {getFirestore, doc, setDoc} from 'firebase/firestore'
+
 const JoinPage = ({history}) => {
     const [loading, setLoading] = useState(false);
     const auth = getAuth(app);
@@ -20,7 +21,7 @@ const JoinPage = ({history}) => {
         });
     }
 
-    const onJoin = (history) => {
+    const onJoin = ({history}) => {
         if(!window.confirm('회원으로 등록하실래요?')) return;
         setLoading(true);
         createUserWithEmailAndPassword(auth, email, password)
