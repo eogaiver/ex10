@@ -26,6 +26,7 @@ const LoginPage = ({history}) => {
             signInWithEmailAndPassword(auth, email, password)
             .then(success=>{
                 sessionStorage.setItem('email', email);
+                sessionStorage.setItem('uid', success.user.uid);
                 history.push('/');
                 setLoading(false);
                 alert("성공")

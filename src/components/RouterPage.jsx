@@ -36,11 +36,11 @@ const RouterPage = (history) => {
                         <div>
                             {sessionStorage.getItem('email') ?
                                 <>
-                                <Link to="/mypage" className='me-2 pt-1'>
-                                    {sessionStorage.getItem('email')}
-                                </Link>
-                                <Link to="/logout"
-                                    onClick={onLogout}>로그아웃</Link>
+                                    <Link to="/mypage" className='me-2 pt-1'>
+                                        {sessionStorage.getItem('email')}
+                                    </Link>
+                                    <Link to="/logout"
+                                        onClick={onLogout}>로그아웃</Link>
                                 </>
                                 :
                                 <Link to="/login">로그인</Link>

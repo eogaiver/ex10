@@ -3,10 +3,11 @@ import {Row, Col, Form, InputGroup, Card, Button} from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import {app} from '../firebaseinit'
 import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth'  
-
+import {getFirestore, doc, setDoc} from 'firebase/firestore'
 const JoinPage = () => {
     const [loading, setLoading] = useState(false);
     const auth = getAuth(app);
+    const db = getFirestore(app);
     const [form, setForm] = useState({
         email:'eogaiver@hanmail.net',
         password:'123123'
@@ -23,7 +24,16 @@ const JoinPage = () => {
         if(!window.confirm('회원으로 등록하실래요?')) return;
         setLoading(true);
         createUserWithEmailAndPassword(auth, email, password)
-        .then(success=>{
+        .then(async success=>{
+            // console.log()
+            const uid = success.user.uid;
+            await setDoc(doc(db, 'user', uid), {
+                email:email,
+                name:'홍길동',
+                address:'인천 서구 경서동',
+                phone:'010-000-0000',
+                photo:''
+            });
             setLoading(false);
             history.push('/login');
         })
