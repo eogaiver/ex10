@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react'
 import {Row, Col, Card, Form, Button, InputGroup} from 'react-bootstrap'
 import {app} from "../firebaseinit"
 import {getFirestore, doc, getDoc, setDoc} from 'firebase/firestore'
-const Mypage = () => {
+import {getStorage, uploadBytes, ref, getDownloadURL} from 'firebase/storage' 
+
+const Mypage = ({history}) => {
     const [loading, setLoading] = useState(false)
     const uid=sessionStorage.getItem("uid");
     const db=getFirestore(app);
+    const storage=getStorage(app);
+
+
     const [image, setImage] = useState('https://via.placeholder.com/200x200');
     
     const [file, setFile] = useState(null);
@@ -13,9 +18,9 @@ const Mypage = () => {
         name:'무기명',
         phone: '010-1010-1010',
         address: '인천 서구 경서동',
-        photo: '',
+        photo: ''
     });
-    const  {name, address, phone, photo} = form;
+    const {name, phone, address, photo} = form;
     const onChange = (e) => {
         setForm({
             ...form,
@@ -24,10 +29,6 @@ const Mypage = () => {
     }
     const onChangeFile = (e) => {
         setImage(URL.createObjectURL(e.target.files[0]));
-        setForm({
-          ...form,
-          image: URL.createObjectURL(e.target.files[0]),
-        });
         setFile(e.target.files[0]);
     }
     const getUser = async() => {
@@ -35,51 +36,69 @@ const Mypage = () => {
         const user = await getDoc(doc(db, 'user', uid));
         console.log(user.data());
         setForm(user.data());
-        setLoading()
-    }
-    
-    //onSave 
-    const onUpdate = () => {
-        if (!window.confirm('수정된내용을 저장하실래요?')) return;
-        setDoc(doc(db, 'user', uid), form)
+        setImage(user.data().photo ? user.data().photo: 'https://via.placeholder.com/200x200')
+        setLoading(false)
     }
 
+    const onUpdate = async() => {
+        if (!window.confirm('수정된내용을 저장하실래요?')) return;
+        //파일업로드
+        setLoading(true);
+        if(file){
+            const snapshot = await uploadBytes( ref(storage, `/photo/${Date.now()}.jpg`), file);
+            const url = await getDownloadURL(snapshot.ref);
+            await setDoc(doc(db, 'user', uid), { ...form, photo:url });
+        }else{
+            await setDoc(doc(db, 'user', uid), { ...form });
+        }
+        setLoading(false);
+        history.push('/');
+    }
 
     useEffect(()=>{
         getUser();
     }, []);
-    if(loading) return <h1>로딩중...</h1>
+
+    if(loading) return <h1 className='text-center my-5'>로딩중...</h1>
     return (
-        <Row>
+        <Row className='my-5'>
             <Col>
-                <h1>회원정보</h1>
-                <Card>
+                <h1 className='text-center mb-5'>회원정보</h1>
+                <Card className='p-5'>
                     <Form>
-                        <InputGroup>
-                            <InputGroup.Text> 이메일 </InputGroup.Text>
-                            <Form.Control readOnly 
-                                value={sessionStorage.getItem("email")}/>                        
+                        <InputGroup className='my-2'>
+                            <InputGroup.Text className='px-5'>메일</InputGroup.Text>
+                            <Form.Control readOnly
+                                value={sessionStorage.getItem('email')}/>
                         </InputGroup>
-                        <InputGroup>
-                            <InputGroup.Text> 이름 </InputGroup.Text>
-                            <Form.Control name="name" onChange={onChange} value={name}/>                        
+                        <InputGroup className='my-2'>
+                            <InputGroup.Text className='px-5'>이름</InputGroup.Text>
+                            <Form.Control 
+                                onChange={onChange} name="name"
+                                value={name}/>
                         </InputGroup>
-                        <InputGroup>
-                            <InputGroup.Text> 전화 </InputGroup.Text>
-                            <Form.Control name="phone" onChange={onChange} value={phone}/>                        
+                        <InputGroup className='my-2'>
+                            <InputGroup.Text className='px-5'>전화</InputGroup.Text>
+                            <Form.Control 
+                                onChange={onChange} name="phone"
+                                value={phone}/>
                         </InputGroup>
-                        <InputGroup>
-                            <InputGroup.Text> 주소 </InputGroup.Text>
-                            <Form.Control name="address" onChange={onChange} value={address}/>                        
+                        <InputGroup className='my-2'>
+                            <InputGroup.Text className='px-5'>주소</InputGroup.Text>
+                            <Form.Control 
+                                onChange={onChange} name="address"
+                                value={address}/>
                         </InputGroup>
-                        <div>
-                            <img className='my-2' 
-                                src={image} width="25%"/>
-                            <Form.Control onChange={onChangeFile} type="file"/>
+                        <div className='my-2'>
+                            <img src={image} width="25%" className='my-2'/>
+                            <Form.Control 
+                                onChange={onChangeFile}
+                                type="file"/>
                         </div>
-                        <Button onClick={onUpdate}
-                            
-                            className='px-5'>정보수정</Button>
+                        <div className='text-center my-2'>
+                            <Button onClick={onUpdate}
+                                className='px-5'>정보수정</Button>
+                        </div>    
                     </Form>
                 </Card>
             </Col>

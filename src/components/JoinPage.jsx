@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import {app} from '../firebaseinit'
 import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth'  
 import {getFirestore, doc, setDoc} from 'firebase/firestore'
-const JoinPage = () => {
+const JoinPage = ({history}) => {
     const [loading, setLoading] = useState(false);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -25,7 +25,7 @@ const JoinPage = () => {
         setLoading(true);
         createUserWithEmailAndPassword(auth, email, password)
         .then(async success=>{
-            // console.log()
+            // console.log('success....', success);
             const uid = success.user.uid;
             await setDoc(doc(db, 'user', uid), {
                 email:email,
